@@ -1,0 +1,18 @@
+# -----------------------------------------------------------------------------
+# Ghostty Styling Configuration
+# -----------------------------------------------------------------------------
+
+theme = Catppuccin Frappe
+
+window-padding-y = 12
+window-height = 35
+window-width = 120
+
+# Background Opacity and Blur
+background-opacity = 0.9
+background-blur = true
+
+# Cursor Styling
+cursor-style = block
+cursor-style-blink = true
+cursor-color = #ff8080

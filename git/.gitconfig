@@ -1,0 +1,29 @@
+[user]
+	name = Rod McLean
+[core]
+	editor = code
+	whitespace = error
+	preloadindex = true
+[init]
+	defaultBranch = main
+[status]
+	branch = true
+	showStash = true
+	showUntrackedFiles = all
+[push]
+	autoSetupRemote = true
+	default = current
+	followTags = true
+[pull]
+	default = current
+	rebase = true
+[log]
+	abbrevCommit = true
+	graphColors = blue,yellow,cyan,magenta,green,red
+[color "decorate"]
+	HEAD = red
+	branch = blue
+	local = default
+	remote = yellow
+	upstream = magenta
+	plain = blue
