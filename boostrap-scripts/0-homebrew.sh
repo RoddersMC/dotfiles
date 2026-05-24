@@ -23,6 +23,8 @@ casks=(
     google-chrome
     ghostty
     visual-studio-code
+    drawio
+    excalidrawz
 )
 
 brew install "{casks[@]}" --cask

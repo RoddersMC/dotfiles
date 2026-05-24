@@ -92,11 +92,16 @@ fi
 if command -v eza &>/dev/null; then
     alias ls='eza'
     alias ll='eza -l --header --icons'
-    alias la='eza -lah --git  --header --icons -group-directories-first'
+    alias la='eza -lah --git  --header --icons --group-directories-first'
     alias lh='eza -Ad .* --header --icons -l'
     alias tree='eza -a --tree --icons'
 else
     echo "!ERROR! - eza is not installed, please install it."
 fi
 
-matrix() { echo -e "\e[1;40m" ; clear ; while :; do echo $LINES $COLUMNS $(( $RANDOM % $COLUMNS)) $(( $RANDOM % 72 )) ;sleep 0.05; done|awk '{ letters="abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789@#$%^&*()"; c=$4;        letter=substr(letters,c,1);a[$3]=0;for (x in a) {o=a[x];a[x]=a[x]+1; printf "\033[%s;%sH\033[2;32m%s",o,x,letter; printf "\033[%s;%sH\033[1;37m%s\033[0;0H",a[x],x,letter;if (a[x] >= $1) { a[x]=0; } }}'}
+# --- Aliasing // drawio export --
+if command -v drawio &>/dev/null; then
+    alias dts='drawio -rx --format svg --transparent --embed-diagram --output ~/drawio-outputs/'
+else
+    echo "!ERROR! - drawio is not installed, please install it."
+fi
