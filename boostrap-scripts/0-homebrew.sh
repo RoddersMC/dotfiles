@@ -12,6 +12,7 @@ packages=(
     fzf
     grep
     neovim
+    stow
     zoxide
     )
 
@@ -27,4 +28,4 @@ casks=(
     excalidrawz
 )
 
-brew install "{casks[@]}" --cask
+brew install "${casks[@]}" --cask

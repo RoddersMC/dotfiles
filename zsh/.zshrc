@@ -82,7 +82,6 @@ source $ZSH/oh-my-zsh.sh
 
 # --- Aliasing // Zoxide ---
 if command -V zoxide &>/dev/null; then
-    alias cd='z'
     alias cdi='zi'
 else
     echo "!ERROR! - zoxide is not installed, please install it."
