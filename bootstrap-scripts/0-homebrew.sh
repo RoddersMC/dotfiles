@@ -12,6 +12,7 @@ packages=(
     fzf
     grep
     neovim
+    starship
     stow
     zoxide
     )
