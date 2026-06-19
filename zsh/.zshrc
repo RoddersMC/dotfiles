@@ -19,35 +19,225 @@ setopt NUMERIC_GLOB_SORT
 # Initialize completion
 autoload -U compinit; compinit
 
-# --- Init // Fuzzy Finder ---
+# --- UTILITY :: Find // Init // Fuzzy Finder ---
 source <(fzf --zsh)
 
-# --- Init and Aliasing // Zoxide ---
+# --- UTILITY :: CD // Init and Aliasing // Zoxide ---
 eval "$(zoxide init zsh)"
 
 if command -V zoxide &>/dev/null; then
+    alias cd='z'
     alias cdi='zi'
 else
     echo "!ERROR! - zoxide is not installed, please install it."
 fi
 
-# --- Aliasing // Eza ---
+# --- UTILITY :: Listing Files // Aliasing // Eza ---
 if command -v eza &>/dev/null; then
     alias ls='eza'
     alias ll='eza -l --header --icons'
     alias la='eza -lah --git  --header --icons --group-directories-first'
-    alias lh='eza -Ad .* --header --icons -l'
-    alias tree='eza -a --tree --icons'
+    alias lh='eza -lAd .* --header --icons'
+    alias tree='eza -a --tree --icons --git'
 else
     echo "!ERROR! - eza is not installed, please install it."
 fi
 
-# --- Aliasing // drawio export --
-if command -v drawio &>/dev/null; then
-    alias dts='drawio -rx --format svg --transparent --embed-diagram --output ~/drawio-outputs/'
+# --- CODE :: SCM // Aliasing // GIT ---
+
+if command -v git &>/dev/null; then
+    alias gs="git status"
+    alias ga="git add"
+    alias gaa="git add --all"
+    alias gua="git restore --staged ."
+  
+    alias gco="git checkout"
+    alias gcb="git checkout -b"
+
+    alias gcm="git commit -m"
+    alias gca="git commit --amend --no-edit"
+    alias gd="git diff"
+
+    # Branch Management
+    alias gb="git branch"
+    alias gba="git branch -a"
+    alias gbd="git branch -d"
+    alias gbD="git branch -D"
+
+    # Push & Pull
+    alias gpl="git pull"
+    alias gph="git push"
+    alias gpsup="git push --set-upstream origin \$(git symbolic-ref --short HEAD)"
+
+    # History & Logging
+    alias glo="git log --oneline --graph --decorate"
+    alias glg="git log --graph --abbrev-commit --decorate --format=format:'%C(bold blue)%h%C(reset) - %C(bold green)(%ar)%C(reset) %C(white)%s%C(reset) %C(dim white)- %an%C(reset)%C(auto)%d%C(reset)' --all"
 else
-    echo "!ERROR! - drawio is not installed, please install it."
+    echo "!ERROR! - git is not installed, please install it."
 fi
 
-# --- Init // starship ---
+# --- THEME // Init // starship ---
 eval "$(starship init zsh)"
+
+
+# --- FUNCTIONS ---
+
+# Display and filter all shell aliases cleanly (Mac & Linux)
+zshelp() {
+    echo -e "\033[1;35m=== Available Shell Shortcuts ===\033[0m"
+    
+    # 1. Grab live Zsh aliases
+    # 2. Use awk to cleanly split by the FIRST equals sign only
+    # 3. Strip out wrapping quotes safely
+    local alias_list
+    alias_list=$(alias | awk '
+    {
+        # Find the position of the first "="
+        eq = index($0, "=")
+        if (eq > 0) {
+            name = substr($0, 1, eq - 1)
+            cmd = substr($0, eq + 1)
+            
+            # Remove leading and trailing single/double quotes if they exist
+            gsub(/^["'\''"]|["'\''"]$/, "", cmd)
+            
+            # Format nicely with a left-aligned 12-character spacing column
+            printf "  \033[1;32m%-12s\033[0m \033[0;36m->\033[0m %s\n", name, cmd
+        }
+    }' | sort)
+
+    if [ -n "$1" ]; then
+        echo -e "\033[0;33mFiltering for: $1\033[0m"
+        echo "$alias_list" | grep --color=always -i "$1"
+    else
+        echo "$alias_list"
+    fi
+    
+    echo -e "\033[1;35m=================================\033[0m"
+}
+
+# Open the current remote Git repository in the default web browser
+gopen() {
+    # 1. Ensure we are inside a valid git repository
+    if ! git rev-parse --is-inside-work-tree &>/dev/null; then
+        echo -e "\033[0;31mError: Not a git repository (or any of the parent directories)\033[0m"
+        return 1
+    fi
+
+    # 2. Extract the remote origin URL safely
+    local url
+    url=$(git remote get-url origin 2>/dev/null)
+
+    if [ -z "$url" ]; then
+        echo -e "\033[0;31mError: No remote 'origin' configured for this repository.\033[0m"
+        return 1
+    fi
+
+    # 3. Clean and convert the URL (Handles SSH formats, removes trailing .git)
+    url=$(echo "$url" | sed -E -e 's/^git@([^:]+):/https:\/\/\1\//' -e 's/\.git$//')
+
+    echo -e "\033[0;32mOpening remote repository:\033[0m $url"
+
+    # 4. Open based on your operating system (macOS vs Linux)
+    if [[ "$OSTYPE" == "darwin"* ]]; then
+        open "$url"
+    else
+        xdg-open "$url" &>/dev/null
+    fi
+}
+
+# 1. AGGREGATED PROCESS TRACKER WITH NUMERICAL IDS
+memtop() {
+    local limit=${1:-10}
+    echo -e "\033[1;35m=== Top $limit Memory Consuming Applications (Aggregated) ===\033[0m"
+    echo -e "  \033[1;32m%-4s %-10s %-25s\033[0m" "ID" "TOTAL MEM" "APPLICATION"
+    echo -e "  \033[0;36m-----------------------------------------------\033[0m"
+
+    local ps_cmd="ps -ax -o rss,comm"
+    [[ "$OSTYPE" != "darwin"* ]] && ps_cmd="ps -ax -o rss,args"
+
+    # Capture, aggregate, and sort by RAM footprint
+    eval "$ps_cmd" | awk 'NR>1 {
+        cmd = $2; for(i=3; i<=NF; i++) cmd = cmd " " $i; sub(/.*\//, "", cmd)
+        sub(/ Helper \(Alerts\)/, "", cmd); sub(/ Helper/, "", cmd); sub(/ --.*/, "", cmd)
+        mem[cmd] += $1 / 1024
+    }
+    END {
+        for (c in mem) {
+            if (mem[c] >= 1024) {
+                printf "%010.2f GB\t%s\n", mem[c] / 1024, c
+            } else {
+                printf "%010.0f MB\t%s\n", mem[c], c
+            }
+        }
+    }' | sort -rh | head -n "$limit" | awk -F'\t' 'BEGIN {count=1} {
+        printf "  \033[1;33m[%d]\033[0m  %-10s %-25s\n", count, $1, $2
+        count++
+    }'
+
+    echo -e "\033[1;35m===============================================================\033[0m"
+    echo -e "💡 Tip: Run \033[1;32mmemstop <name>\033[0m or just \033[1;32mmemstop\033[0m for an interactive menu."
+}
+
+# 2. INTUITIVE APPLICATION KILL SWITCH
+memstop() {
+    # Scenario A: User passed a specific application name string directly
+    if [ -n "$1" ]; then
+        local app_name="$1"
+        echo -e "\033[1;31mTerminating all background processes matching: '$app_name'...\033[0m"
+        
+        if [[ "$OSTYPE" == "darwin"* ]]; then
+            pkill -f "$app_name"
+        else
+            pkill -f -i "$app_name"
+        fi
+        echo -e "\033[1;32m✓ Termination signals sent.\033[0m"
+        return 0
+    fi
+
+    # Scenario B: Interactive Menu Mode (No parameters passed)
+    echo -e "\033[1;35m=== Interactive Memory Kill Menu ===\033[0m"
+    
+    local ps_cmd="ps -ax -o rss,comm"
+    [[ "$OSTYPE" != "darwin"* ]] && ps_cmd="ps -ax -o rss,args"
+
+    # Re-generate the top 15 list dynamically into a temporary indexed bash array
+    local apps=()
+    while IFS=$'\t' read -r mem_val name; do
+        apps+=("$name")
+        # Format a quick console print string for the menu select interface
+        echo -e "  \033[1;33m[${#apps[@]}]\033[0m \033[1;32m$mem_val\033[0m -> $name"
+    done < <(eval "$ps_cmd" | awk 'NR>1 {
+        cmd = $2; for(i=3; i<=NF; i++) cmd = cmd " " $i; sub(/.*\//, "", cmd)
+        sub(/ Helper \(Alerts\)/, "", cmd); sub(/ Helper/, "", cmd); sub(/ --.*/, "", cmd)
+        mem[cmd] += $1 / 1024
+    }
+    END {
+        for (c in mem) {
+            if (mem[c] >= 1024) printf "%010.2f GB\t%s\n", mem[c] / 1024, c
+            else printf "%010.0f MB\t%s\n", mem[c], c
+        }
+    }' | sort -rh | head -n 15)
+
+    echo -e "  \033[1;31m[q]\033[0m  Quit menu"
+    echo -e "\033[1;35m====================================\033[0m"
+    
+    # Prompt the user for an ID index selection
+    echo -n "Enter the number of the app you want to kill: "
+    read -r choice
+
+    if [[ "$choice" == "q" || -z "$choice" ]]; then
+        echo "Cancelled."
+        return 0
+    fi
+
+    # Validate that the user input is a valid list item index number
+    if [[ "$choice" -gt 0 && "$choice" -le "${#apps[@]}" ]]; then
+        local selected_app="${apps[$choice]}"
+        echo -e "\033[1;31mKilling all instances of '$selected_app'...\033[0m"
+        pkill -f "$selected_app"
+        echo -e "\033[1;32m✓ Done. Re-run memtop to check freed RAM.\033[0m"
+    else
+        echo -e "\033[0;31mInvalid selection.\033[0m"
+    fi
+}
