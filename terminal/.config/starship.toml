@@ -1,0 +1,51 @@
+# Don't print newlines between terminal prompts
+add_newline = true
+
+# 1. THE PROMPT LAYOUT
+format = """
+$directory\
+$git_branch\
+$git_status\
+[|](bold comment_grey) \
+$memory_usage\
+$cmd_duration\
+$line_break\
+$character\
+"""
+
+# 2. GLOBAL COLOR PALETTE SETTINGS
+# Change these hex codes to instantly update your entire prompt colors
+palette = "custom_theme"
+
+[palettes.custom_theme]
+primary_blue  = "#61afef"
+accent_purple = "#c678dd"
+system_yellow = "#e5c07b"
+warn_orange   = "#d19a66"
+comment_grey  = "#5c6370"
+
+# 3. MODULE CONFIGURATIONS
+
+[directory]
+style = "bold primary_blue"
+format = "[$path]($style) "
+truncation_length = 5
+truncation_symbol = ".../"
+
+[character]
+success_symbol = "[➜](bold green) "
+error_symbol = "[➜](bold red) "
+
+# MEMORY USAGE CONFIGURATION
+[memory_usage]
+disabled = false
+threshold = 0                      # 0 means always display memory, regardless of % used
+style = "bold system_yellow"
+format = "Mem [$ram]($style) "
+
+# COMMAND DURATION CONFIGURATION
+[cmd_duration]
+min_time = 0                       # 0 means show execution time for EVERY single command
+style = "bold warn_orange"
+show_milliseconds = false
+format = "took [$duration]($style) "
