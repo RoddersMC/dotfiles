@@ -1,5 +1,12 @@
 # Roderick McLean's Stow'ed Configuration
 
+## To install
+
+1. Install Homebrew with ```/bin/bash -c "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/HEAD/install.sh)"```
+1. Clone this directory to your `~` home directory
+1. run the bootstrap-scripts
+1. `stow <directory_name> --adopt` to symlink configuration on device.
+
 ## ZSH configuration
 
 `zsh/.zprofile` - Used on login
