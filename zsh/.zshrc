@@ -43,6 +43,17 @@ else
     echo "!ERROR! - eza is not installed, please install it."
 fi
 
+# --- UTILITY :: TODO Function // Aliasing // Tuxedo ---
+if command -v tuxedo &>/dev/null; then
+    TODO_DIR="~/.config/tuxedo"
+    TODO_FILE="$TODO_DIR/todo.txt"
+    DONE_FILE="$TODO_DIR/done.txt"
+    alias tdl="tuxedo $TODO_FILE"
+    alias tda="tuxedo add"
+else
+    echo "!ERROR! - Tuxedo task manager is not installed, please install it."
+fi
+
 # --- CODE :: SCM // Aliasing // GIT ---
 
 if command -v git &>/dev/null; then

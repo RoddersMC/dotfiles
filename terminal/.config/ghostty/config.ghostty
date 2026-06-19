@@ -2,7 +2,7 @@
 # Ghostty Styling Configuration
 # -----------------------------------------------------------------------------
 
-theme = Catppuccin Frappe
+theme = Catppuccin Mocha
 
 window-padding-y = 12
 window-height = 35

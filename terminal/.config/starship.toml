@@ -8,6 +8,7 @@ $git_branch\
 $git_status\
 [|](bold comment_grey) \
 $memory_usage\
+[|](bold comment_grey) \
 $cmd_duration\
 $line_break\
 $character\

@@ -14,6 +14,7 @@ packages=(
     neovim
     starship
     stow
+    tuxedo
     zoxide
     )
 
