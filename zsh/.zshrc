@@ -19,8 +19,15 @@ setopt NUMERIC_GLOB_SORT
 # Initialize completion
 autoload -U compinit; compinit
 
-# --- UTILITY :: Find // Init // Fuzzy Finder ---
+# --- UTILITY :: Find // Init and alias // Fuzzy Finder ---
 source <(fzf --zsh)
+
+if command -v fzf &>/dev/null; then
+    alias f='fzf'
+    alias ff='fzf --preview "bat --style=numbers --color=always --line-range=:500 {}"'
+else
+    echo "!ERROR! - fzf is not installed, please install it."
+fi
 
 # --- UTILITY :: CD // Init and Aliasing // Zoxide ---
 eval "$(zoxide init zsh)"
@@ -38,7 +45,7 @@ if command -v eza &>/dev/null; then
     alias ll='eza -l --header --icons'
     alias la='eza -lah --git  --header --icons --group-directories-first'
     alias lh='eza -lAd .* --header --icons'
-    alias tree='eza -a --tree --icons --git'
+    alias tree='eza -aTli --git'
 else
     echo "!ERROR! - eza is not installed, please install it."
 fi
@@ -125,6 +132,50 @@ zshelp() {
     fi
     
     echo -e "\033[1;35m=================================\033[0m"
+}
+
+# Explains the system path and its contents. Much better than echoing a raw $PATH.
+expath() {
+    # 1. Set default sample size to 5 if no argument is provided
+    local limit=${1:-5}
+
+    # 2. Print the entire raw PATH with blue separators
+    echo -e "\033[1;36m=== Current System PATH ===\033[0m"
+    echo -e "${PATH//:/\033[1;34m:\033[0m}"
+    echo -e "\033[1;36m===========================\033[0m"
+
+    # 3. Loop through individual directories
+    echo "$PATH" | tr ':' '\n' | while read -r dir; do
+        # Skip empty entries if they occur
+        [[ -z "$dir" ]] && continue
+
+        if [[ -d "$dir" ]]; then
+            echo -e "\n\033[1;32m[+] $dir\033[0m"
+            
+            # Fetch human-readable disk usage size safely
+            local size
+            size=$(du -sh "$dir" 2>/dev/null | awk '{print $1}')
+            echo "   Directory size:   $size"
+            
+            # Zsh Trick: (N-*) checks for executable files and handles empty dirs natively
+            local execs=($dir/*(N-*))
+            
+            # Count only the filtered executables
+            local count=${#execs[@]}
+            echo "   Executable count: $count"
+            
+            # Preview the user-defined number of true commands
+            if (( count > 0 )); then
+                echo "   Sample binaries (showing up to $limit):"
+                # Print only the filename, not the full path
+                printf '%s\n' "${execs[@]:t}" | head -n "$limit" | sed 's/^/    |-> /'
+            else
+                echo "   Sample binaries:  (No executable commands found)"
+            fi
+        else
+            echo -e "\n\033[1;31m[-] $dir (Broken Path)\033[0m"
+        fi
+    done
 }
 
 # Open the current remote Git repository in the default web browser

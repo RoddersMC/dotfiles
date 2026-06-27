@@ -2,7 +2,7 @@
 # Ghostty Styling Configuration
 # -----------------------------------------------------------------------------
 
-theme = Catppuccin Mocha
+theme = Nord Wave
 
 window-padding-y = 12
 window-height = 35
@@ -13,6 +13,6 @@ background-opacity = 0.9
 background-blur = true
 
 # Cursor Styling
-cursor-style = block
+cursor-style = underline
 cursor-style-blink = true
 cursor-color = #ff8080

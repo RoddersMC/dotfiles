@@ -7,9 +7,10 @@ brew upgrade
 # Install packages
 
 packages=(
-    git
+    bat
     eza
     fzf
+    git
     grep
     neovim
     starship
