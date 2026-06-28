@@ -1,6 +1,5 @@
-[user]
-	name = Rod McLean
-	email = roddersmc@gmail.com
+[include]
+    path = ~/.gitconfig.local
 [core]
 	editor = code
 	whitespace = error

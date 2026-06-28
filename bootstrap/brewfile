@@ -1,0 +1,24 @@
+# Tap the core and cask repositories (implicitly handled, but good for structure)
+tap "homebrew/core"
+tap "homebrew/cask"
+
+# CLI Tools (Formulae)
+brew "bat"            # A cat(1) clone with syntax highlighting and Git integration   
+brew "eza"            # Modern replacement for 'ls'  
+brew "fzf"            # Fuzzy Finder
+brew "git"            # Git version control system
+brew "grep"
+brew "herdr"          # Terminal multiplexer for AI agents
+brew "neovim"         # Modern Vim-based text editor
+brew "shellcheck"     # A static analysis tool for shell scripts to be POSIX-compliant
+brew "starship"
+brew "stow"           # Symlink manager for dotfiles
+brew "tuxedo"         # A terminal based to do list system
+brew "zoxide"         # A smarter cd command
+
+# GUI Applications (Casks)
+cask "google-chrome"
+cask "ghostty"
+cask "visual-studio-code"
+cask "drawio"
+cask "excalidrawz"    # Native Excalidraw client for macOS

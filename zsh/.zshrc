@@ -1,3 +1,5 @@
+#!/bin/sh
+
 # --- ZSH // History ---
 # Guide: https://github.com/rothgar/mastering-zsh/blob/master/docs/config/history.md
 
@@ -19,12 +21,23 @@ setopt NUMERIC_GLOB_SORT
 # Initialize completion
 autoload -U compinit; compinit
 
-# --- UTILITY :: Find // Init and alias // Fuzzy Finder ---
+# --- UTILITY :: Terminal Multiplexer // alias // Herder ---
+
+if command -v herdr &>/dev/null; then
+    alias h="herdr"
+else
+    echo "!ERROR! - herdr is not installed, please install it."
+fi
+
+# --- UTILITY :: Find // Init, alias, and command exports // Fuzzy Finder ---
 source <(fzf --zsh)
 
 if command -v fzf &>/dev/null; then
-    alias f='fzf'
-    alias ff='fzf --preview "bat --style=numbers --color=always --line-range=:500 {}"'
+    alias f="fzf"
+    alias ff="fzf 
+        --preview 'bat --style=numbers --color=always --line-range=:500 {}'"
+    export FZF_CTRL_T_OPTS="
+        --preview 'bat --style=numbers --color=always --line-range=:500 {}'"
 else
     echo "!ERROR! - fzf is not installed, please install it."
 fi
@@ -52,7 +65,7 @@ fi
 
 # --- UTILITY :: TODO Function // Aliasing // Tuxedo ---
 if command -v tuxedo &>/dev/null; then
-    TODO_DIR="~/.config/tuxedo"
+    TODO_DIR="$HOME/.config/tuxedo"
     TODO_FILE="$TODO_DIR/todo.txt"
     DONE_FILE="$TODO_DIR/done.txt"
     alias tdl="tuxedo $TODO_FILE"
@@ -158,7 +171,7 @@ expath() {
             echo "   Directory size:   $size"
             
             # Zsh Trick: (N-*) checks for executable files and handles empty dirs natively
-            local execs=($dir/*(N-*))
+            local execs=("$dir"/*(N-*))
             
             # Count only the filtered executables
             local count=${#execs[@]}
@@ -167,7 +180,7 @@ expath() {
             # Preview the user-defined number of true commands
             if (( count > 0 )); then
                 echo "   Sample binaries (showing up to $limit):"
-                # Print only the filename, not the full path
+                # Print onsly the filename, not the full path
                 printf '%s\n' "${execs[@]:t}" | head -n "$limit" | sed 's/^/    |-> /'
             else
                 echo "   Sample binaries:  (No executable commands found)"
