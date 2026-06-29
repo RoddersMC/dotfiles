@@ -3,7 +3,7 @@
 ## How to Install
 
 ``` bash
-/bin/bash -c "$(curl -fsSL https://github.com/roddersmc/dotfiles/archive/main.tar.gz | tar -xz -C /tmp && /tmp/dotfiles-main/install.sh)"
+/bin/bash -c "$(curl -fsSL https://github.com/roddersmc/dotfiles/archive/refs/heads/main.tar.gz | tar -xz -C /tmp && /tmp/dotfiles-main/install.sh)"
 ```
 
 ## what install does
